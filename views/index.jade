@@ -3,3 +3,12 @@ extends layout
 block content
   h1= title
   p Welcome to #{title}
+
+  table
+    tbody
+    - pages.forEach(function(o,i){
+      tr
+        td(width=100): a(href=o.path, width=100) #{o.name}
+        td: h #{o.memo}
+    - })
+
