@@ -1,18 +1,25 @@
-extends layout
-
+doctype 5
+html
+  head
+    title= title
+    link(rel='stylesheet', href='/stylesheets/style.css')
 block content
   h1 chat
 
-  input(type='text', id='msg_input', style='width:200px')
-  button(onclick='publishMessage();') 語る
-  div(id='msg')
+  ul(id='messages')
+  form(action='')
+    input(id='m', autocomplete='off')
+    button Send
 
+  script(src='https://cdn.socket.io/socket.io-1.2.0.js')
+  script(src='http://code.jquery.com/jquery-1.11.1.js')
   script(type='text/javascript').
-    var spa = (function( $ ){
-    var configMap={},
-    $chatSlider,
-    toggleSlider, onClickSlider, initModule;
-  ... 
-  }());
-
-
+    var socket = io();
+    $('form').submit(function(){
+      socket.emit('chat message', $('#m').val());
+      $('#m').val('');
+      return false;
+    });
+    socket.on('chat message', function(msg){
+      $('#messages').append($('<li>').text(msg));
+    });

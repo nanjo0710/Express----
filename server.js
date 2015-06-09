@@ -9,6 +9,7 @@ var routes = require('./routes');
 var http = require('http').createServer(app);
 var path = require('path');
 var fs = require('fs');
+var chat = require('./routes/chat');
 
 app.configure(function(){
   app.set('port', process.env.PORT || 3000);
@@ -42,12 +43,7 @@ app.get('/', function (req, res) {
   });
 });
 
-app.get('/chat', function (req, res) {
-  fs.readFile('./views/index.html', 'UTF-8', function(err, data) {
-    res.writeHead(200, { 'Content-Type': 'text/html' });
-    res.end(data);  // 「Hello, world!」から変更
-  });
-});
+app.get('/chat', chat.index);
 
 
 http.listen(app.get('port'), function(){
