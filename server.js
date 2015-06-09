@@ -3,13 +3,97 @@
  * Module dependencies.
  */
 
+var express = require('express');
+var app = express();
+var routes = require('./routes');
+var http = require('http').createServer(app);
+var path = require('path');
+var fs = require('fs');
+
+app.configure(function(){
+  app.set('port', process.env.PORT || 3000);
+  app.set('views', __dirname + '/views');
+  app.set('view engine', 'jade');
+  app.use(express.favicon());
+  app.use(express.logger('dev'));
+  app.use(express.bodyParser());
+  app.use(express.methodOverride());
+  app.use(app.router);
+  app.use(express.static(path.join(__dirname, 'public')));
+});
+
+app.configure('development', function(){
+  app.use(express.errorHandler());
+});
+
+var io = require('socket.io')(http);
+io.on('connection', function (socket) {
+  socket.on('chat message', function (msg) {
+    io.emit('chat message', msg);
+  });
+});
+
+
+//app.get('/', routes.index);
+app.get('/', function (req, res) {
+  fs.readFile('./views/index.html', 'UTF-8', function(err, data) {
+    res.writeHead(200, { 'Content-Type': 'text/html' });
+    res.end(data);  // 「Hello, world!」から変更
+  });
+});
+
+app.get('/chat', function (req, res) {
+  fs.readFile('./views/index.html', 'UTF-8', function(err, data) {
+    res.writeHead(200, { 'Content-Type': 'text/html' });
+    res.end(data);  // 「Hello, world!」から変更
+  });
+});
+
+
+http.listen(app.get('port'), function(){
+  console.log("Express server listening on port " + app.get('port'));
+});
+
+/*
 var express = require('express')
+  , app = express()
   , routes = require('./routes')
   , user = require('./routes/user')
-  , http = require('http')
+  , chat = require('./routes/chat')
+  , http = require('http').createServer(app)
   , path = require('path');
 
-var app = express();
+// 1.モジュールオブジェクトの初期化
+var fs = require("fs");
+var io = require("socket.io").listen(http);
+
+// ユーザ管理ハッシュ
+var userHash = {};
+
+// 2.イベントの定義
+io.sockets.on("connection", function (socket) {
+
+  // 接続開始カスタムイベント(接続元ユーザを保存し、他ユーザへ通知)
+  socket.on("connected", function (name) {
+    var msg = name + "が入室しました";
+    userHash[socket.id] = name;
+    io.sockets.emit("publish", {value: msg});
+  });
+
+  // メッセージ送信カスタムイベント
+  socket.on("publish", function (data) {
+    io.sockets.emit("publish", {value:data.value});
+  });
+
+  // 接続終了組み込みイベント(接続元ユーザを削除し、他ユーザへ通知)
+  socket.on("disconnect", function () {
+    if (userHash[socket.id]) {
+      var msg = userHash[socket.id] + "が退出しました";
+      delete userHash[socket.id];
+      io.sockets.emit("publish", {value: msg});
+    }
+  });
+});
 
 app.configure(function(){
   app.set('port', process.env.PORT || 3000);
@@ -86,6 +170,9 @@ app.get('/users/:userid', function (req, res) {
     res.send('userId:' + req.params.userid);
 })
 
-http.createServer(app).listen(app.get('port'), function(){
+app.get('/chat', chat.index);
+
+http.listen(app.get('port'), function(){
   console.log("Express server listening on port " + app.get('port'));
 });
+*/

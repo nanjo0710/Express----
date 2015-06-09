@@ -12,7 +12,7 @@ exports.index = function (req, res) {
     { name: 'ab*cd', path: 'abxcd', memo: 'will match abcd, abxcd, abRABDOMcd, ab123cd, and so on' },
     { name: 'ab(cd)?e', path: 'abe', memo: 'will match /abe and /abcde' },
     { name: 'ab?cd', path: 'acd', memo: 'will match acd and abcd' },
-    { name: 'abcd', path: 'ab?cd', memo: 'will match acd and abcd' },
+    { name: 'chat', path: 'chat', memo: 'chat' },
     { name: 'abcd', path: 'ab?cd', memo: 'will match acd and abcd' },
     { name: 'abcd', path: 'ab?cd', memo: 'will match acd and abcd' },
     { name: 'abcd', path: 'ab?cd', memo: 'will match acd and abcd' },

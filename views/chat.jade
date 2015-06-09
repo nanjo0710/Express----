@@ -1,0 +1,18 @@
+extends layout
+
+block content
+  h1 chat
+
+  input(type='text', id='msg_input', style='width:200px')
+  button(onclick='publishMessage();') 語る
+  div(id='msg')
+
+  script(type='text/javascript').
+    var spa = (function( $ ){
+    var configMap={},
+    $chatSlider,
+    toggleSlider, onClickSlider, initModule;
+  ... 
+  }());
+
+
