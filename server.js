@@ -27,28 +27,58 @@ app.configure('development', function(){
   app.use(express.errorHandler());
 });
 
+// ユーザ管理ハッシュ
+var userHash = {};
+
 var io = require('socket.io')(http);
 io.on('connection', function (socket) {
+
   socket.on('chat message', function (msg) {
-    io.emit('chat message', msg);
+    io.emit('chat message', dateToString(new Date()) + ' : ' + getUserName(socket.id) + ' : ' + msg);
+  });
+
+  // 接続開始カスタムイベント(接続元ユーザを保存し、他ユーザへ通知)
+  socket.on("connected", function (name) {
+    var msg = 'test' + "が入室しました";
+    userHash[socket.id] = 'test';
+    io.sockets.emit("publish", {value: msg});
+  });
+  // メッセージ送信カスタムイベント
+  socket.on("publish", function (data) {
+    io.sockets.emit("publish", {value:data.value});
+  });
+  // 接続終了組み込みイベント(接続元ユーザを削除し、他ユーザへ通知)
+  socket.on("disconnect", function () {
+    if (userHash[socket.id]) {
+      var msg = userHash[socket.id] + "が退出しました";
+      delete userHash[socket.id];
+      io.sockets.emit("publish", {value: msg});
+    }
   });
 });
 
-
-//app.get('/', routes.index);
-app.get('/', function (req, res) {
-  fs.readFile('./views/index.html', 'UTF-8', function(err, data) {
-    res.writeHead(200, { 'Content-Type': 'text/html' });
-    res.end(data);  // 「Hello, world!」から変更
-  });
-});
-
+app.get('/', routes.index);
 app.get('/chat', chat.index);
-
 
 http.listen(app.get('port'), function(){
   console.log("Express server listening on port " + app.get('port'));
 });
+
+var dateToString = function (date) {
+  return date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate() + ' ' + date.getHours() + ':' + date.getMinutes();
+};
+
+var getUserName = function (socket_id) {
+  var userName = userHash[socket_id];
+  if (userName) {
+    return userName
+  }
+
+  userName = 'name-' + Object.keys(userHash).length;
+  userHash[socket_id] = userName;
+
+  return userName;
+};
 
 /*
 var express = require('express')

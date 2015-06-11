@@ -1,13 +1,10 @@
-doctype 5
-html
-  head
-    title= title
-    link(rel='stylesheet', href='/stylesheets/style.css')
+extends layout
+
 block content
-  h1 chat
+  h1= title
 
   ul(id='messages')
-  form(action='')
+  form(id='chat_form', action='')
     input(id='m', autocomplete='off')
     button Send
 
