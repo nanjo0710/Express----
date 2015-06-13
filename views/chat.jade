@@ -18,5 +18,6 @@ block content
       return false;
     });
     socket.on('chat message', function(msg){
-      $('#messages').append($('<li>').text(msg));
+      var contents = '<li><table> <tr><td width="150px">' + msg.time + '</td><td rowspan="2">' + msg.msg + '</td></tr><tr><td rowspan="2">' + msg.user + '</td></tr></table></li>';
+      $('#messages').append(contents);
     });

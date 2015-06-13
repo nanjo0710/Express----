@@ -34,25 +34,26 @@ var io = require('socket.io')(http);
 io.on('connection', function (socket) {
 
   socket.on('chat message', function (msg) {
-    io.emit('chat message', dateToString(new Date()) + ' : ' + getUserName(socket.id) + ' : ' + msg);
+    var message = { user: getUserName(socket.id), time: dateToString(new Date()), msg: msg};
+    io.emit('chat message', message);
   });
 
   // 接続開始カスタムイベント(接続元ユーザを保存し、他ユーザへ通知)
   socket.on("connected", function (name) {
     var msg = 'test' + "が入室しました";
     userHash[socket.id] = 'test';
-    io.sockets.emit("publish", {value: msg});
+    io.sockets.emit("publish", { value: msg });
   });
   // メッセージ送信カスタムイベント
   socket.on("publish", function (data) {
-    io.sockets.emit("publish", {value:data.value});
+    io.sockets.emit("publish", { value: data.value });
   });
   // 接続終了組み込みイベント(接続元ユーザを削除し、他ユーザへ通知)
   socket.on("disconnect", function () {
     if (userHash[socket.id]) {
       var msg = userHash[socket.id] + "が退出しました";
       delete userHash[socket.id];
-      io.sockets.emit("publish", {value: msg});
+      io.sockets.emit("publish", { value: msg });
     }
   });
 });
